@@ -7,31 +7,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Media;
 
 namespace HW140509_Timer
 {
     public partial class Form1 : Form
     {
         bool isClick = true;
-        
+       
         int m;
         int s;
         int ms;
+
+        SoundPlayer sp;
 
         public Form1()
         {
             InitializeComponent();
             textBox1.KeyDown += new KeyEventHandler (input);
+            sp = new SoundPlayer(Properties.Resources.bell);
         }
 
         private void input(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                string[] minSec = textBox1.Text.Split(' ');
-                m = Convert.ToInt32(minSec[0]);
-                s = Convert.ToInt32(minSec[1]);
-                ms = 6000 * m + 100 * s;
+                string strSec = textBox1.Text;
+                s = Convert.ToInt32(strSec);
+                ms = 100 * s;
+                m = s / 60;
                 textBox1.Text = "";
                 label4.Text = Time(ms % 100);
                 label3.Text = Time(s % 60) + ":";
@@ -41,10 +45,6 @@ namespace HW140509_Timer
             
         }
 
-        private void radioButton2_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
         private string Time(int num)
         {
             if (num / 10 != 0)
@@ -87,24 +87,26 @@ namespace HW140509_Timer
                 if (ms == 0)
                 {
                     timer1.Stop();
+                    sp.Play();
                 }
             }
         }
 
+        private void reset()
+        {
+            m = 0;
+            ms = 0;
+            s = 0;
+            label4.Text = Time(ms % 100);
+            label3.Text = Time(s % 60) + ":";
+            label2.Text = Time(m) + ":";
+            timer1.Stop();
+            isClick = true;
+
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
-            if (radioButton2.Checked)
-            {
-                m = 0;
-                ms = 0;
-                s = 0;
-            }
-            else if (radioButton3.Checked)
-            {
-                string[] minSec = textBox1.Text.Split(' ');
-                m = Convert.ToInt32(minSec[0]);
-                s = Convert.ToInt32(minSec[1]);
-            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -122,26 +124,30 @@ namespace HW140509_Timer
                 timer1.Stop();
                 isClick = true;
             }
-           
-            
-                
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            m = 0;
-            ms = 0;
-            s = 0;
-            label4.Text = Time(ms % 100);
-            label3.Text = Time(s % 60) + ":";
-            label2.Text = Time(m) + ":";
-            timer1.Stop();
-            isClick = true;
+            reset();
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            reset();
+        }
+
+        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        {
+            reset();
+        }
+
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+            reset();
         }
     }
 }
