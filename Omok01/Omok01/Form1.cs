@@ -420,10 +420,10 @@ namespace Omok01
             }
             if (countForFour >= 2 || countForThree >= 2)
             {
-                if (isBlack == true)
-                    return 1;
-                else
+                if (isBlack == false)
                     return -1;
+                else
+                    return 0;
             }
 
             return 0;
