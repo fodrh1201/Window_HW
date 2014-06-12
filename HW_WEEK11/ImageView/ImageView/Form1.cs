@@ -78,5 +78,10 @@ namespace ImageView
             }
             pictureBox1.Image = bmp2;
         }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
