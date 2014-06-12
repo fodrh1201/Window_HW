@@ -19,11 +19,20 @@ namespace Omok01
         int y = 0;
         int iX = 0;
         int iY = 0;
+        int startX;
+        int startY;
+        int finX;
+        int finY;
+        int constSx;
+        int constSy;
+        int constFx;
+        int constFy;
 
         int[] dx = new int[4] { -1, -1, 0, 1 };
         int[] dy = new int[4] { 0, 1, 1, 1 };
 
         int[,] board = new int[21, 21];
+        bool[,] judgeBoard = new bool[21, 21];
 
         LinkedList<Term> stoneList = new LinkedList<Term>();
 
@@ -80,10 +89,22 @@ namespace Omok01
                 }
                 stoneList.AddLast(stone);
                 board[iY + 1, iX + 1] = stone.color;
-                if (Judge() == 1)
+                if (Judge(iY, iX) == 1)
+                {
                     textBox1.Text = "흑 승리";
-                else if (Judge() == -1)
+                    constSx = startX;
+                    constSy = startY;
+                    constFx = finX;
+                    constFy = finY;
+                }
+                else if (Judge(iY, iX) == -1)
+                {
                     textBox1.Text = "백 승리";
+                    constSx = startX;
+                    constSy = startY;
+                    constFx = finX;
+                    constFy = finY;
+                }
 
                 textBox3.Text = "";
             }
@@ -113,6 +134,7 @@ namespace Omok01
 
             DrawSemiCircle();
             DrawCircle();
+            DrawLine();
             g.DrawImage(screen, 0, 0);
 
             p.Dispose();
@@ -152,7 +174,7 @@ namespace Omok01
                 stone.arrX = iY;
                 stone.arrY = iX;
                 isBlack = false;
-                textBox2.Text = String.Format("{0}, {1}, Black", iY+1, iX+1);
+                textBox2.Text = String.Format("{0}, {1}, Black", iY, iX);
             }
             else
             {
@@ -162,18 +184,26 @@ namespace Omok01
                 stone.arrX = iY;
                 stone.arrY = iX;
                 isBlack = true;
-                textBox2.Text = String.Format("{0}, {1}, White", iY+1, iX+1);
+                textBox2.Text = String.Format("{0}, {1}, White", iY, iX);
             }
             stoneList.AddLast(stone);
             board[iY + 1, iX + 1] = stone.color;
 
-            if (Judge() == 1)
+            if (Judge(iY, iX) == 1)
             {
                 textBox1.Text = "흑 승리";
+                constSx = startX;
+                constSy = startY;
+                constFx = finX;
+                constFy = finY;
             }
-            else if (Judge() == -1)
+            else if (Judge(iY, iX) == -1)
             {
-                textBox1.Text = "백 승리";   
+                textBox1.Text = "백 승리";
+                constSx = startX;
+                constSy = startY;
+                constFx = finX;
+                constFy = finY;
             }
 
 
@@ -268,9 +298,19 @@ namespace Omok01
             }
         }
 
-        private int Judge()
+        private void DrawLine()
+        {
+            Pen p = new Pen(Color.Green, 2);
+            g4.DrawLine(p, 50 + 30 * constSy - 30, 50 + 30 * constSx - 30, 50 + 30 * constFy - 30, 50 + 30 * constFx - 30);
+            p.Dispose();
+         
+        }
+
+        private int Judge(int iY, int iX)
         {
             int count = 0;
+            int countForThree = 0;
+            int countForFour = 0;
             int judge;
             int color = board[iY + 1, iX + 1];
             int k = 1;
@@ -286,28 +326,90 @@ namespace Omok01
             {
                 while (color == judge)
                 {
-                    color = board[iY + 1 + k * dx[i], iX + 1 + k * dy[i]];
+                    int currentX = iY + 1 + (k - 1) * dx[i];
+                    int currentY = iX + 1 + (k - 1) * dy[i];
+
+                    for (int l = 0; l < 4; l++)
+                    {
+                        if (l != i)
+                        {
+                            if (color == board[currentX + dx[l], currentY + dy[l]])
+                            {
+                                if (judgeBoard[currentX + dx[l], currentY + dy[l]])
+                                {
+                                    Judge(currentX + dx[l], currentY + dy[l]);
+                                    judgeBoard[currentX + dx[l], currentY + dy[l]] = false;
+                                }
+                            }
+                        }
+                    }
+
+                    for (int l = 0; l < 4; l++)
+                    {
+                        if (l != i)
+                        {
+                            if (color == board[currentX - dx[l], currentY - dy[l]])
+                            {
+                                if (judgeBoard[currentX - dx[l], currentY - dy[l]])
+                                {
+                                    Judge(currentX - dx[l], currentY - dy[l]);
+                                    judgeBoard[currentX - dx[l], currentY - dy[l]] = false;
+                                }
+                            }
+                        }
+                    }
+
+                    judgeBoard = new bool[21, 21];
+
+                    color = board[currentX + dx[i], currentY + dy[i]];
                     count++;
                     k++;
-                    
                 }
-             
+
+                int tempSX = iY + 1 + (k - 2) * dx[i];
+                int tempSY = iX + 1 + (k - 2) * dy[i];
+                
                 k = 2;
                 color = board[iY + 1 - dx[i], iX + 1 - dy[i]];
 
                 while (color == judge)
                 {
-                    color = board[iY + 1 - k * dx[i], iX + 1 - k * dy[i]];
+                    int currentX = iY + 1 - (k - 1) * dx[i];
+                    int currentY = iX + 1 - (k - 1) * dy[i];
+
+
+                    for (int l = 0; l < 4; l++)
+                    {
+                        if (l != i)
+                        {
+                            if (color == board[currentX - dx[l], currentY - dy[l]])
+                                Judge(currentX - dx[l], currentY - dy[l]);
+                        }
+                    }
+
+                    color = board[currentX - dx[i], currentY - dy[i]];
                     count++;
                     k++;
                 }
-               
-                
+
+                int tempFX = iY + 1 - (k - 2) * dx[i];
+                int tempFY = iX + 1 - (k - 2) * dy[i];
+
                 color = board[iY + 1, iX + 1];
                 k = 1;
 
+                if (count == 3)
+                    countForThree++;
+
+                if (count == 4)
+                    countForFour++;
+
                 if (count == 5)
                 {
+                    startX = tempSX;
+                    startY = tempSY;
+                    finX = tempFX;
+                    finY = tempFY;
                     count = 0;
                     if (isBlack == false)
                         return 1;
@@ -316,9 +418,15 @@ namespace Omok01
                 }
                 count = 0;
             }
-            
+            if (countForFour >= 2 || countForThree >= 2)
+            {
+                if (isBlack == true)
+                    return 1;
+                else
+                    return -1;
+            }
+
             return 0;
-            
         }
 
         private void button1_Click_1(object sender, EventArgs e)
@@ -327,6 +435,10 @@ namespace Omok01
             stoneList = new LinkedList<Term>();
             isBlack = true;
             textBox1.Text = "";
+            constSx = 0;
+            constSy = 0;
+            constFx = 0;
+            constFy = 0;
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
