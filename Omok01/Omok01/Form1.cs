@@ -105,7 +105,6 @@ namespace Omok01
                     constFx = finX;
                     constFy = finY;
                 }
-
                 textBox3.Text = "";
             }
         }
@@ -126,12 +125,9 @@ namespace Omok01
             for (int i = 0; i < 19; i++)
             {
                 g4.DrawLine(p, 50, 50 + 30 * i, 590, 50 + 30 * i);
+                g4.DrawLine(p, 50 + 30 * i, 50, 50 + 30 * i, 590);
             }
-            for (int j = 0; j < 19; j++)
-            {
-                g4.DrawLine(p, 50 + 30 * j, 50, 50 + 30 * j, 590);
-            }
-
+            
             DrawSemiCircle();
             DrawCircle();
             DrawLine();
@@ -283,19 +279,15 @@ namespace Omok01
 
         private void DrawSemiCircle()
         {
+            ChangePosition(ref x, ref y);
+            SolidBrush b;
+
             if (isBlack)
-            {
-                SolidBrush b = new SolidBrush(Color.FromArgb(180, 100, 100, 100));
-                ChangePosition(ref x, ref y);
-                g4.FillEllipse(b, x, y, 30, 30);
-            }
+                b = new SolidBrush(Color.FromArgb(180, 100, 100, 100));
             else
-            {
-                
-                SolidBrush b = new SolidBrush(Color.FromArgb(180, 255, 255, 255));
-                ChangePosition(ref x, ref y);
-                g4.FillEllipse(b, x, y, 30, 30);
-            }
+                b = new SolidBrush(Color.FromArgb(180, 255, 255, 255));
+
+            g4.FillEllipse(b, x, y, 30, 30);
         }
 
         private void DrawLine()
